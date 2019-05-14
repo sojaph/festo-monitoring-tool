@@ -3,29 +3,31 @@ const data = require('./access');
 
 const typeDefs = `
   type Query {
-    hello(name: String): String!
-    times: [TimeDiff],
-    resourceUsage: [ResourceUsage]
+    KPIs: KPI,
+    resourceUsage: ResourceUsage
   }
-  type TimeDiff {
-    ONo: ID,
-    timeTaken: String
+  type KPI {
+    PPT: Float,
+    PT: Float,
+    FT: Float,
+    FP: Int,
+    RP: Int
   }
   type ResourceUsage {
-    count: Int,
-    ResourceID: Int,
-    Description: String,
-    total: [Total]
-  }
-  type Total {
+    resource: [Resource],
     total: Int
+  }
+  type Resource {
+    Count: Int,
+    ResourceID: ID,
+    Description: String,
+    ResourceName: String
   }
 `;
 
 const resolvers = {
   Query: {
-    hello: (_, { name }) => `Hello ${name || 'World'}`,
-    times: () => data.try(),
+    KPIs: () => data.getKPIs(),
     resourceUsage: () => data.getResourceCount()
   },
 };

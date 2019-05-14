@@ -1,3 +1,3 @@
 const trial = require('./access');
 
-trial.try();
+trial.getKPIs();
