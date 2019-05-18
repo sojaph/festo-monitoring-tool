@@ -7,19 +7,23 @@ const typeDefs = `
     resourceUsage: ResourceUsage
   }
   type KPI {
-    PPT: Float,
-    PT: Float,
+    ICT: Int,
+    ACT: Int,
+    PPT: Int,
+    PT: [Process],
     FT: Float,
     FP: Int,
     RP: Int
   }
+  type Process {
+    PT: Float,
+    Description: String
+  }
   type ResourceUsage {
     resource: [Resource],
-    total: Int
   }
   type Resource {
-    Count: Int,
-    ResourceID: ID,
+    TotalTime: Float,
     Description: String,
     ResourceName: String
   }

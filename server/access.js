@@ -8,28 +8,33 @@ class Access {
         let res = {};
         try{
             // Query the DB
-            const PTs = await connection.query(`SELECT AVG(DATEDIFF("s", PS, PE)) AS PPT, AVG(DATEDIFF("s", S, E)) AS PT 
-            FROM (SELECT [ONo], [OPos], MIN([PlanedStart]) as PS, MAX([PlanedEnd]) AS PE, MIN([Start]) as S, MAX([End]) AS E 
-            FROM tblFinStep WHERE [ONo] IN (2170, 2171, 2173, 2174, 2178, 2179, 2180) 
-            GROUP BY [ONo], [OPos])`);
+            const ACT = await connection.query(`SELECT MAX(DATEDIFF("s", [Start], [End])) as ACT 
+                                    FROM tblFinStep WHERE [ONo] IN (2170, 2171, 2173, 2178, 2179, 2180)`);
+            const PPT = await connection.query(`SELECT DATEDIFF("s", MIN([Start]), MAX([End])) as PPT 
+                                    FROM tblFinStep WHERE [ONo] IN (2170, 2171, 2173, 2178, 2179, 2180)`);
+            const PT = await connection.query(`SELECT AVG(DATEDIFF("s", [Start], [End])) AS PT , [Description]
+                                    FROM tblFinStep
+                                    WHERE [ONo] IN (2170, 2171, 2173, 2178, 2179, 2180) GROUP BY [Description];`);
             const FT = await connection.query(`SELECT DATEDIFF("s", [Start], [End]) AS FT 
                                             FROM tblFinStep 
-                                            WHERE [ONo] IN (2170, 2171, 2173, 2174, 2178, 2179, 2180) 
+                                            WHERE [ONo] IN (2170, 2171, 2173, 2178, 2179, 2180) 
                                             AND ErrorStep = true AND [Start] IS NOT NULL AND [End] IS NOT NULL;`);
             const total = await connection.query(`SELECT SUM(productsPerOrder) AS totalProducts 
                 FROM (
                 SELECT [ONo], COUNT(*) AS productsPerOrder 
                     FROM (
                         SELECT [ONo], [OPos], COUNT(*) AS num 
-                        FROM tblFinStep WHERE [ONo] IN (2170, 2171, 2173, 2174, 2178, 2179, 2180) 
+                        FROM tblFinStep WHERE [ONo] IN (2170, 2171, 2173, 2178, 2179, 2180) 
                         GROUP BY [ONo], [OPos])
                     GROUP BY [ONo]);`);
             const rejected = await connection.query(`SELECT COUNT(*) AS RP 
                                 FROM tblFinStep 
-                                WHERE [ONo] IN (2170, 2171, 2173, 2174, 2178, 2179, 2180) 
+                                WHERE [ONo] IN (2170, 2171, 2173, 2178, 2179, 2180) 
                                 AND [ErrorStep] = true AND [Start] IS NOT NULL AND [End] IS NOT NULL;`);
-            res.PT = PTs[0].PT;
-            res.PPT = PTs[0].PPT;
+            res.ICT = 165;
+            res.ACT = ACT[0].ACT;
+            res.PT = PT;
+            res.PPT = PPT[0].PPT - 3600;
             res.FT = FT[0].FT;
             res.FP = total[0].totalProducts - rejected[0].RP;
             res.RP = rejected[0].RP;
@@ -41,13 +46,9 @@ class Access {
     static async getResourceCount(){
         let res = {};
         try{
-            const totalSteps = await connection.query(`SELECT COUNT(*) as [total] FROM tblFinStep 
-                                                     WHERE tblFinStep.[ONo] IN (2170, 2171, 2173, 2174, 2178, 2179, 2180)`);
-            const resource = await connection.query(`SELECT COUNT(*) as [Count], tfs.ResourceID, r.Description, r.ResourceName
-            FROM tblFinStep tfs LEFT OUTER JOIN tblResource r ON r.ResourceID = tfs.ResourceID 
-            WHERE tfs.[ONo] IN (2170, 2171, 2173, 2174, 2178, 2179, 2180)
-            GROUP BY tfs.ResourceID, r.Description, r.ResourceName`);
-            res.total = totalSteps[0].total;
+            const resource = await connection.query(`SELECT SUM(DATEDIFF("s", [Start], [End])) AS TotalTime , r.[Description], r.[ResourceName]
+            FROM tblFinStep tfs LEFT OUTER JOIN tblResource r ON tfs.ResourceID = r.ResourceID
+            WHERE tfs.[ONo] IN (2170, 2171, 2173, 2178, 2179, 2180) GROUP BY r.[Description], r.ResourceName;`);
             res.resource = resource;
         } catch(e) {
             throw e;
