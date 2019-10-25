@@ -1,0 +1,10 @@
+{
+    "database" : {
+        "user": "lfdllsetscvgzo",
+        "host": "ec2-54-247-70-127.eu-west-1.compute.amazonaws.com",
+        "database": "d3klto0uug49m",
+        "password": "d9d91c701f283f3baa006836cc8787d7ad984d1c642cb595a9943de308464f47",
+        "port": 5432,
+        "ssl": true
+    }
+}

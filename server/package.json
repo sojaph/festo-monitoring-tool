@@ -12,6 +12,7 @@
   "dependencies": {
     "graphql-yoga": "^1.17.4",
     "mongoose": "^5.5.2",
-    "node-adodb": "^5.0.2"
+    "node-adodb": "^5.0.2",
+    "pg": "^7.12.1"
   }
 }

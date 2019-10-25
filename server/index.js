@@ -16,8 +16,8 @@ const typeDefs = `
     RP: Int
   }
   type Process {
-    PT: Float,
-    Description: String
+    pt: Float,
+    description: String
   }
   type ResourceUsage {
     resource: [Resource],
